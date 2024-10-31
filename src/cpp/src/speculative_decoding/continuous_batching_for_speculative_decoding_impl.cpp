@@ -284,8 +284,11 @@ void ContinuousBatchingPipeline::ContinuousBatchingForSpeculativeDecodingImpl::m
     bool to_generate = true;
     while (to_generate) {
         generated_tokens_cnt++;
-
+        auto time0 = std::chrono::high_resolution_clock::now();
         step();
+        auto time1 = std::chrono::high_resolution_clock::now();
+        auto time_res0 = std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+        std::cout << "Draft model time = " << time_res0 << " ms\n";
 
         to_generate = false;
         for (auto& request : m_requests) {

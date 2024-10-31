@@ -16,6 +16,7 @@ EncodedResults greedy_decoding(
     std::optional<ov::Tensor> position_ids
 ) {
     ov::Shape prompts_shape = input_ids.get_shape();
+    std::cout << "Greedy decoding tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
     const size_t batch_size = prompts_shape[0];
     size_t running_batch_size = batch_size;
     size_t prompt_len = prompts_shape[1];
@@ -43,8 +44,14 @@ EncodedResults greedy_decoding(
     std::iota(beam_data, beam_data + running_batch_size, 0);
 
     const auto infer_start = std::chrono::steady_clock::now();
+    auto time0 = std::chrono::high_resolution_clock::now();
     m_model_runner.infer();
+    
     const auto infer_ms = PerfMetrics::get_microsec(std::chrono::steady_clock::now() - infer_start);
+    auto time1 = std::chrono::high_resolution_clock::now();
+    auto time_res0 = std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+    std::cout << "Main model time = " << time_res0 << " ms\n";
+
     raw_perf_counters.m_inference_durations[0] = MicroSeconds(infer_ms);
     raw_perf_counters.m_token_infer_durations.emplace_back(infer_ms);
     auto logits = m_model_runner.get_tensor("logits");

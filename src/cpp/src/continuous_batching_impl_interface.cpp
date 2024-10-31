@@ -72,6 +72,7 @@ ContinuousBatchingPipeline::ImplInterface::generate(
             res.m_status
         });
     }
+    std::cout << "Test 1\n";
     return decoded;
 }
 }

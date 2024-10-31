@@ -138,7 +138,11 @@ void ContinuousBatchingPipeline::SpeculativeDecodingImpl::step() {
 
     ManualTimer main_timer("speculative_decoding: main_model: step()");
     main_timer.start();
+    auto time0 = std::chrono::high_resolution_clock::now();
     m_main_pipeline->step();
+    auto time1 = std::chrono::high_resolution_clock::now();
+    auto time_res0 = std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+    std::cout << "Main model time = " << time_res0 << " ms\n";
     main_timer.end();
     m_sd_metrics.main_duration += main_timer.get_duration();
     m_pipeline_metrics = m_main_pipeline->get_metrics();
@@ -234,6 +238,7 @@ ContinuousBatchingPipeline::SpeculativeDecodingImpl::generate(const std::vector<
             result.m_generation_ids.push_back(std::move(generation_output.generated_ids));
             result.m_scores.push_back(generation_output.score);
         }
+        std::cout << "Tokens info: " << result.m_generation_ids[0].size() << " generated tokens\n";
         result.m_status = generation->get_status();
         results.push_back(std::move(result));
     }
@@ -243,7 +248,8 @@ ContinuousBatchingPipeline::SpeculativeDecodingImpl::generate(const std::vector<
     m_sd_metrics.total_duration = generate_timer.get_duration();
 
     // Print Speculative decoding metrics
-    if (0) {
+    std::cout << "Total matches: " << m_sd_metrics.get_draft_accepted_tokens_counter(0) << "\n";
+    if (1) {
         std::cout << std::endl;
         std::cout << "Total duration, ms: " << m_sd_metrics.total_duration << std::endl;
         std::cout << "Draft model duration, ms: " << m_sd_metrics.draft_duration << std::endl;
@@ -257,6 +263,7 @@ ContinuousBatchingPipeline::SpeculativeDecodingImpl::generate(const std::vector<
         std::cout << "Generated tokens: " << sampling_params[0].max_new_tokens << std::endl;
         std::cout << "Accepted token rate, %: " << m_sd_metrics.get_draft_accepted_tokens_percentage(0) << std::endl;
     }
+
 
     return results;
 }

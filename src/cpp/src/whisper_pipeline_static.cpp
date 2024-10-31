@@ -464,7 +464,7 @@ WhisperDecodedResults WhisperPipeline::StaticWhisperPipeline::generate(
 
         result.chunks = chunks;
     }
-
+    std::cout << "Test 4\n";
     return result;
 }
 

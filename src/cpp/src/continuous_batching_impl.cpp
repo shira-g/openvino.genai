@@ -85,6 +85,7 @@ GenerationHandle
 ContinuousBatchingPipeline::ContinuousBatchingImpl::add_request(uint64_t request_id,
                                                                const ov::Tensor& input_ids,
                                                                ov::genai::GenerationConfig sampling_params) {
+    std::cout << "Start add_request\n";                                                                
     sampling_params.set_eos_token_id(m_tokenizer.get_eos_token_id());
     sampling_params.validate();
     SequenceGroup::Ptr sequence_group = std::make_shared<SequenceGroup>(request_id, input_ids,
@@ -100,6 +101,7 @@ ContinuousBatchingPipeline::ContinuousBatchingImpl::add_request(uint64_t request
         std::lock_guard<std::mutex> lock{m_awaiting_requests_mutex};
         m_awaiting_requests.push_back(sequence_group);
     }
+    
     return std::make_shared<GenerationHandleImpl>(sequence_group->get_generation_stream(), sampling_params);
 };
 
@@ -111,6 +113,7 @@ ContinuousBatchingPipeline::ContinuousBatchingImpl::add_request(uint64_t request
     timer.start();
     ov::Tensor input_ids = m_tokenizer.encode(prompt).input_ids;
     timer.end();
+    std::cout << "Tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
     return add_request(request_id, input_ids, sampling_params);
 }
 
@@ -328,10 +331,11 @@ ContinuousBatchingPipeline::ContinuousBatchingImpl::generate(const std::vector<o
             result.m_generation_ids.push_back(std::move(generation_output.generated_ids));
             result.m_scores.push_back(generation_output.score);
         }
+        std::cout << "Tokens info: " << result.m_generation_ids[0].size() << " generated tokens\n";
         result.m_status = generation->get_status();
         results.push_back(std::move(result));
     }
-
+    std::cout << "Here\n" ;
     OPENVINO_ASSERT(results.size() == input_ids.size());
     return results;
 }

@@ -577,6 +577,7 @@ DecodedResults StaticLLMPipeline::generate(
     raw_counters.detokenization_durations.emplace_back(PerfMetrics::get_microsec(decode_stop_time - decode_start_time));
     decoded_results.perf_metrics.m_evaluated = false;
     decoded_results.perf_metrics.evaluate_statistics(start_time);
+    std::cout << "Test 3\n";
     return decoded_results;
 }
 

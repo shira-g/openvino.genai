@@ -147,6 +147,7 @@ public:
                 encoded_input = m_tokenizer.encode(prompt);
             }
         }
+        // std::cout << "Num of tokens: " << encoded_input.? << std::endl;
         auto encode_stop_time =  std::chrono::steady_clock::now();
         auto encoded_results = generate(encoded_input, config, streamer);
 
@@ -205,6 +206,7 @@ public:
             input_ids = data->input_ids;
             attention_mask = data->attention_mask;
         }
+        std::cout << "Tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
 
         GenerationConfig config = (generation_config.has_value()) ? *generation_config : m_generation_config;
 
