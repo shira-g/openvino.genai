@@ -175,6 +175,7 @@ public:
             m_model_runner.reset_state();
         }
     }
+  
 
     EncodedResults generate(
         const EncodedInputs& inputs,
@@ -192,6 +193,16 @@ public:
             attention_mask = data->attention_mask;
         }
         std::cout << "Tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
+        // std::cout << "input ids:" << std::endl ; 
+        // size_t element_count = input_ids.get_size();
+        // size_t size = input_ids.get_byte_size();
+        // std::vector<int64_t> rc(element_count);
+        // memcpy(rc.data(), input_ids.data(), size);
+        
+        // for (int64_t i: rc){
+        //     std::cout << i << std::endl;
+        // }
+        // std::cout << rc.data()[0] << std::endl ;
 
         GenerationConfig config = (generation_config.has_value()) ? *generation_config : m_generation_config;
 

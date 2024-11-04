@@ -113,7 +113,14 @@ ContinuousBatchingPipeline::ContinuousBatchingImpl::add_request(uint64_t request
     timer.start();
     ov::Tensor input_ids = m_tokenizer.encode(prompt).input_ids;
     timer.end();
-    std::cout << "Tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
+    // std::cout << "Tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
+    // std::cout << "input_ids: " << "\n" ;
+    
+    // std::cout << input_ids.get_element_type() << "," << "\n" ;
+    // for (auto& i : input_ids) {
+    //     std::cout << "c: " << config << std::endl;
+    // }
+    // std::cout << "input_ids: " << input_ids << "\n";
     return add_request(request_id, input_ids, sampling_params);
 }
 

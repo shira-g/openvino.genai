@@ -68,6 +68,7 @@ std::pair<EncodedResults, int32_t> get_lm_encoded_results(
     }
 
     ov::Shape prompts_shape = input_ids.get_shape();
+    // std::cout << "Tokens info: Add request with " << input_ids.get_shape() << " prompt tokens\n";
     const size_t batch_size = prompts_shape[0];
 
     const size_t prompt_len = prompts_shape[1];
@@ -102,7 +103,11 @@ std::pair<EncodedResults, int32_t> get_lm_encoded_results(
     m_llm.set_tensor("beam_idx", beam_idx);
 
     const auto infer_start = std::chrono::steady_clock::now();
+    auto time0 = std::chrono::high_resolution_clock::now();
     m_llm.infer();
+    auto time1 = std::chrono::high_resolution_clock::now();
+    auto time_res0 = std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+    std::cout << "Main model time = " << time_res0 << " ms\n";
     const auto infer_end = std::chrono::steady_clock::now();
     const auto infer_ms = PerfMetrics::get_microsec(infer_end - infer_start);
     raw_perf_counters.m_inference_durations[0] += MicroSeconds(infer_ms);
@@ -198,7 +203,11 @@ std::pair<EncodedResults, int32_t> get_lm_encoded_results(
         m_llm.set_tensor("beam_idx", ov::Tensor{ov::element::i32, {total_num_tokens}, next_beams.data()});
 
         const auto infer_start = std::chrono::steady_clock::now();
+        auto time0 = std::chrono::high_resolution_clock::now();
         m_llm.infer();
+        auto time1 = std::chrono::high_resolution_clock::now();
+        auto time_res0 = std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+        std::cout << "Main model time = " << time_res0 << " ms\n";
         const auto infer_end = std::chrono::steady_clock::now();
         const auto infer_ms = PerfMetrics::get_microsec(infer_end - infer_start);
         raw_perf_counters.m_inference_durations[0] += MicroSeconds(infer_ms);
@@ -242,7 +251,9 @@ std::pair<EncodedResults, int32_t> get_lm_encoded_results(
             const auto& generation_output = generation_outputs[generation_output_idx];
             results.tokens.push_back(std::move(generation_output.generated_ids));
             results.scores.push_back(generation_output.score);
+            std::cout << "Tokens info: " << generation_output.generated_ids.size() << " generated tokens\n";
         }
+        
         // next_selected_beam = sampler.last_selected_beam(request);
     }
 
